@@ -260,22 +260,22 @@ int main(int argc,char* argv[])
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
-	//fill in default settings
-	mwInitParam(&httpParam);
-	httpParam.maxClients=32;
-	httpParam.httpPort = 80;
-	GetFullPath(httpParam.pchWebPath, argv[0], "htdocs");
+    //fill in default settings
+    mwInitParam(&httpParam);
+    httpParam.maxClients = 32;
+    httpParam.httpPort = 80;
+    GetFullPath(httpParam.pchWebPath, argv[0], "htdocs");
 #ifndef DISABLE_BASIC_WWWAUTH
-	httpParam.pxAuthHandler = authHandlerList;
+    httpParam.pxAuthHandler = authHandlerList;
 #endif
-	httpParam.pxUrlHandler=urlHandlerList;
-	httpParam.flags=FLAG_DIR_LISTING;
-	httpParam.tmSocketExpireTime = 15;
-	httpParam.pfnPost = DefaultWebPostCallback;
+    httpParam.pxUrlHandler = urlHandlerList;
+    httpParam.flags = FLAG_DIR_LISTING;
+    httpParam.tmSocketExpireTime = 15;
+    httpParam.pfnPost = DefaultWebPostCallback;
 #ifdef MEDIA_SERVER
-	httpParam.pfnFileUpload = TranscodeUploadCallback;
+    httpParam.pfnFileUpload = TranscodeUploadCallback;
 #else
-	httpParam.pfnFileUpload = DefaultWebFileUploadCallback;
+    httpParam.pfnFileUpload = DefaultWebFileUploadCallback;
 #endif
 
 	//parsing command line arguments
@@ -294,7 +294,7 @@ int main(int argc,char* argv[])
 						       "		-M	: specifiy max clients per IP\n"
 							   "		-s	: specifiy download speed limit in KB/s [default: none]\n"
 							   "		-n	: disallow multi-part download [default: allow]\n"
-                               "		-d	: disallow multi-part download [default: allow]\n"
+                               "		-d	: disallow directory listing [default ON]\n\n"
 						       "		-c	: register callback for urlHandler\n\n");
 					fflush(stderr);
                                         exit(1);
@@ -325,14 +325,13 @@ int main(int argc,char* argv[])
 					break;
                 case 'c':
                     if ((++i)<argc)
-                    {
                         add_handler_from_dll(argv[i]);
-                    }
                     break;
 				}
 			}
 		}
 	}
+    httpParam.pxUrlHandler = urlHandlerList;
 	{
 		int i;
 		int error = 0;
