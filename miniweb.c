@@ -31,33 +31,6 @@ int uhAsyncDataTest(UrlHandlerParam* param);
 int uhRTSP(UrlHandlerParam* param);
 int uhSerial(UrlHandlerParam* param);
 
-UrlHandler urlHandlerList[]={
-	{"stats", uhStats, NULL},
-#ifdef ENABLE_SERIAL
-	{"serial", uhSerial, NULL},
-#endif
-#ifdef HAVE_THREAD
-	{"async", uhAsyncDataTest, NULL},
-#endif
-#ifdef MEDIA_SERVER
-	{"test.sdp", uhRTSP, NULL},
-	{"MediaServer/VideoItems/", uhMediaItemsTranscode, ehMediaItemsEvent},
-#endif
-#ifdef _7Z
-	{"7z", uh7Zip, NULL},
-#endif
-#ifdef _MPD
-	{"mpd", uhMpd, ehMpd},
-#endif
-#ifdef _VOD
-	{"vodstream", uhVodStream,NULL},
-	{"vodlib", uhLib,0},
-	{"vodplay", uhVod,ehVod},
-	{"stream", uhStream,NULL},
-#endif
-	{NULL},
-};
-
 #ifndef DISABLE_BASIC_WWWAUTH
 AuthHandler authHandlerList[]={
 	{"stats", "user", "pass", "group=admin", ""},
@@ -170,8 +143,113 @@ void GetFullPath(char* buffer, char* argv0, char* path)
 	}
 }
 
+UrlHandler* urlHandlerList = NULL;
+
+int get_handler_list_length()
+{
+    int n = 0;
+    if (urlHandlerList)
+        for (n = 0; urlHandlerList[n].pchUrlPrefix; n++)
+            ;
+    return n;
+}
+
+void add_handler(const char* prefix, PFNURLCALLBACK uhf, PFNEVENTHANDLER ehf/*, void* psys = NULL*/)
+{
+    int n, length;
+    length = get_handler_list_length();
+    UrlHandler* new_list = calloc(length + 2, sizeof(UrlHandler));
+    if (new_list)
+    {
+        for (n = 0; n < length; ++n)
+        {
+            new_list[n] = urlHandlerList[n];
+        }
+        new_list[n].pchUrlPrefix = prefix;
+        new_list[n].pfnUrlHandler = uhf;
+        new_list[n].pfnEventHandler = ehf;
+        new_list[n].p_sys = NULL;
+
+        new_list[n+1].pchUrlPrefix = NULL;
+
+        free(urlHandlerList);
+        urlHandlerList = new_list;
+    }
+}
+
+void add_handler_from_dll(const char* arg)
+{
+    char* name, *function_name, *prefix, *tmp;
+    HANDLE library;
+    PFNURLCALLBACK uhf;
+
+    name = malloc(strlen(arg) + 1);
+    strcpy(name, arg);
+    function_name = strrchr(name, ':');
+    prefix = strchr(name, ':');
+
+    if (prefix != NULL && function_name != prefix)
+    {
+        *function_name = '\0';
+        ++function_name;
+        *prefix = '\0';
+        if (*function_name && prefix > name)
+        {
+            ++prefix;
+            tmp = prefix;
+            prefix = name;
+            name = tmp;
+            fprintf(stderr, "Loading handler with prefix: %s, from dll: %s, with function name: %s\n", prefix, name, function_name);
+            library = LoadLibraryA(name);
+            if (library)
+            {
+                uhf = (PFNURLCALLBACK)GetProcAddress(library, function_name);
+                if (uhf)
+                {
+                    add_handler(prefix, uhf, NULL);
+                }
+                else
+                {
+                    fprintf(stderr, "couldn't load %s (Error: %d)!\n", function_name, GetLastError());
+                    FreeLibrary(library);
+                }
+            }
+            else
+                fprintf(stderr, "couldn't load \"%s\" (Error: %d)!\n", name, GetLastError());
+        }
+        else
+            fprintf(stderr, "names shouldn't be empty in \"%s\"!\n", arg);
+    }
+    else
+        fprintf(stderr, "Two colons should be in \"%s\"!\n", arg);
+    }
+
 int main(int argc,char* argv[])
 {
+    add_handler("stats", uhStats, NULL);
+#ifdef ENABLE_SERIAL
+    add_handler("serial", uhSerial, NULL);
+#endif
+#ifdef HAVE_THREAD
+    add_handler("async", uhAsyncDataTest, NULL);
+#endif
+#ifdef MEDIA_SERVER
+    add_handler( "test.sdp", uhRTSP, NULL );
+    add_handler( "MediaServer/VideoItems/", uhMediaItemsTranscode, ehMediaItemsEvent );
+#endif
+#ifdef _7Z
+    add_handler( "7z", uh7Zip, NULL );
+#endif
+#ifdef _MPD
+    add_handler( "mpd", uhMpd, ehMpd );
+#endif
+#ifdef _VOD
+    add_handler( "vodstream", uhVodStream, NULL );
+    add_handler( "vodlib", uhLib, 0 );
+    add_handler( "vodplay", uhVod, ehVod );
+    add_handler( "stream", uhStream, NULL );
+#endif
+
 	fprintf(stderr,"MiniWeb (built on %s)\n(C)2005-2013 Written by Stanley Huang <stanleyhuangyc@gmail.com>\n\n", __DATE__);
 
 #ifdef WIN32
@@ -216,7 +294,8 @@ int main(int argc,char* argv[])
 						       "		-M	: specifiy max clients per IP\n"
 							   "		-s	: specifiy download speed limit in KB/s [default: none]\n"
 							   "		-n	: disallow multi-part download [default: allow]\n"
-						       "		-d	: disallow directory listing [default ON]\n\n");
+                               "		-d	: disallow multi-part download [default: allow]\n"
+						       "		-c	: register callback for urlHandler\n\n");
 					fflush(stderr);
                                         exit(1);
 
@@ -244,6 +323,12 @@ int main(int argc,char* argv[])
 				case 'd':
 					httpParam.flags &= ~FLAG_DIR_LISTING;
 					break;
+                case 'c':
+                    if ((++i)<argc)
+                    {
+                        add_handler_from_dll(argv[i]);
+                    }
+                    break;
 				}
 			}
 		}
