@@ -22,8 +22,8 @@
 
 #elif defined(WIN32)
 #include <windows.h>
+#include <fcntl.h>
 #include <io.h>
-
 #define snprintf _snprintf
 
 #else

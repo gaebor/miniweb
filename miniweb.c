@@ -179,8 +179,9 @@ void add_handler(const char* prefix, PFNURLCALLBACK uhf, PFNEVENTHANDLER ehf/*, 
 
 void add_handler_from_dll(const char* arg)
 {
-    char* name, *function_name, *prefix, *tmp;
+    char* name, *function_name, *prefix, *tmp, *event_handler_name;
     HANDLE library;
+    PFNEVENTHANDLER ehf = NULL;
     PFNURLCALLBACK uhf;
 
     name = malloc(strlen(arg) + 1);
@@ -188,26 +189,28 @@ void add_handler_from_dll(const char* arg)
     function_name = strrchr(name, ':');
     prefix = strchr(name, ':');
 
-    if (prefix != NULL && function_name != prefix)
+    if (prefix != NULL && function_name > prefix + 1)
     {
         *function_name = '\0';
         ++function_name;
         *prefix = '\0';
-        if (*function_name && prefix > name)
+        if (*function_name)
         {
             ++prefix;
             tmp = prefix;
             prefix = name;
             name = tmp;
-            fprintf(stderr, "Loading handler with prefix: %s, from dll: %s, with function name: %s\n", prefix, name, function_name);
+            fprintf(stderr, "Loading handler. prefix: %s, dll: %s, function: %s\n", prefix, name, function_name);
             library = LoadLibraryA(name);
             if (library)
             {
+                event_handler_name = strrchr(function_name, '|');
+                if (event_handler_name)
+                    *event_handler_name++ = '\0';
+                ehf = (PFNEVENTHANDLER)GetProcAddress(library, event_handler_name);
                 uhf = (PFNURLCALLBACK)GetProcAddress(library, function_name);
                 if (uhf)
-                {
-                    add_handler(prefix, uhf, NULL);
-                }
+                    add_handler(prefix, uhf, ehf);
                 else
                 {
                     fprintf(stderr, "couldn't load %s (Error: %d)!\n", function_name, GetLastError());
@@ -218,7 +221,7 @@ void add_handler_from_dll(const char* arg)
                 fprintf(stderr, "couldn't load \"%s\" (Error: %d)!\n", name, GetLastError());
         }
         else
-            fprintf(stderr, "names shouldn't be empty in \"%s\"!\n", arg);
+            fprintf(stderr, "function name shouldn't be empty in \"%s\"!\n", arg);
     }
     else
         fprintf(stderr, "Two colons should be in \"%s\"!\n", arg);
@@ -295,7 +298,9 @@ int main(int argc,char* argv[])
 							   "		-s	: specifiy download speed limit in KB/s [default: none]\n"
 							   "		-n	: disallow multi-part download [default: allow]\n"
                                "		-d	: disallow directory listing [default ON]\n\n"
-						       "		-c	: register callback for urlHandler\n\n");
+						       "		-c	: register callback for urlHandler\n"
+                               "			: format is the following \"prefix:dll:urlhandler|eventhandler\"\n"
+                               "			: event handler is optional, prefix may be empty\n");
 					fflush(stderr);
                                         exit(1);
 

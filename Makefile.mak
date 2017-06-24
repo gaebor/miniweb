@@ -1,9 +1,8 @@
 CC=cl
 LD=link
-CFLAGS=/Ox /W3 /Ilibctb/include /c /nologo /TC /MT
+CFLAGS=/Ox /W3 /Ilibctb/include /nologo /TC /MT
 HTTPOBJ=httppil.obj http.obj httpxml.obj httphandler.obj httppost.obj httpauth.obj
 HEADERS=httpint.h httpapi.h httpxml.h
-TARGET=miniweb
 
 DEFINES= /D_CRT_SECURE_NO_DEPRECATE /DNDEBUG /DNODEBUG /DWIN32
 LDFLAGS= WSock32.Lib
@@ -14,18 +13,27 @@ HEADERS+= httpserial.h
 DEFINES+= -Ilibctb/include
 !endif
 
-default: all
+default: miniweb
 
-all: $(HTTPOBJ) miniweb.obj
-	$(LD) $(LDFLAGS) $(HTTPOBJ) miniweb.obj /OUT:$(TARGET).exe
+miniweb: miniweb.exe
 
-.c.obj:
-	$(CC) $(DEFINES) $(CFLAGS) $<
+miniweb.exe: $(HTTPOBJ) miniweb.obj
+	$(LD) $(LDFLAGS) $(HTTPOBJ) miniweb.obj /OUT:miniweb.exe
 
-min: $(HTTPOBJ) httpmin.obj
-	$(LD) $(LDFLAGS) $(HTTPOBJ) httpmin.obj /OUT:httpd.exe
+all : miniweb postfile plugin
+
+must_build:
+
+postfile : must_build 
+	$(CC) $(CFLAGS) $(DEFINES) /Ipostfile postfile/*.c /link $(LDFLAGS) /OUT:postfile.exe
+
+plugin : must_build
+	$(CC) $(CFLAGS) /I. $(DEFINES) plugin/plugin.c /link $(LDFLAGS) /DLL /OUT:plugin.dll
+
+.c.obj::
+	$(CC) $(DEFINES) $(CFLAGS) /c $<
 
 clean:
 	del /Q *.obj *.exe
 	del /Q *.obj
-	rd /Q /S Debug Release
+	rd /Q /S Win32

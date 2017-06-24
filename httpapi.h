@@ -369,13 +369,13 @@ void* mwHttpLoop(void* _hp);
 int mwServerShutdown(HttpParam* hp);
 
 ///////////////////////////////////////////////////////////////////////
-// mwSetRcvBufSize. Change the TCP windows size of acceped sockets
+// mwSetRcvBufSize. Change the TCP windows size of accepted sockets
 ///////////////////////////////////////////////////////////////////////
 int mwSetRcvBufSize(WORD wSize);
 
 ///////////////////////////////////////////////////////////////////////
 // mwPostRegister. Specify the callback to be called when a POST is
-// recevied.
+// received.
 ///////////////////////////////////////////////////////////////////////
 PFNPOSTCALLBACK mwPostRegister(HttpParam *httpParam, PFNPOSTCALLBACK);
 
