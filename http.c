@@ -446,7 +446,7 @@ void _mwCloseAllConnections(HttpParam* hp)
 
 ////////////////////////////////////////////////////////////////////////////
 // _mwHttpThread
-// Webserver independant processing thread. Handles all connections
+// Webserver independent processing thread. Handles all connections
 ////////////////////////////////////////////////////////////////////////////
 void* mwHttpLoop(void* _hp)
 {
@@ -1120,7 +1120,7 @@ int _mwProcessReadSocket(HttpParam* hp, HttpSocket* phsSocket)
 		}
 
 		phsSocket->request.headerSize = (int)(headerEnd - phsSocket->buffer + 4);
-		DBG("[%d] HTTP Header (%d bytes):\n%s", phsSocket->socket, phsSocket->request.headerSize, phsSocket->buffer);
+		DBG("[%d] HTTP Header (%d bytes):\n%s\n", phsSocket->socket, phsSocket->request.headerSize, phsSocket->buffer);
 		if (_mwParseHttpHeader(phsSocket)) {
 			SYSLOG(LOG_INFO,"Error parsing request\n");
 			SETFLAG(phsSocket, FLAG_CONN_CLOSE);
