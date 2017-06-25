@@ -119,6 +119,7 @@
     <ClCompile Include="httppil.c" />
     <ClCompile Include="httppost.c" />
     <ClCompile Include="httpxml.c" />
+    <ClCompile Include="loadplugin.c" />
     <ClCompile Include="miniweb.c" />
     <ClCompile Include="processpil.c" />
   </ItemGroup>
@@ -128,6 +129,7 @@
     <ClInclude Include="httppil.h" />
     <ClInclude Include="httpvod.h" />
     <ClInclude Include="httpxml.h" />
+    <ClInclude Include="loadplugin.h" />
     <ClInclude Include="processpil.h" />
     <ClInclude Include="revision.h" />
   </ItemGroup>

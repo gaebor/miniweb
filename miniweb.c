@@ -12,6 +12,7 @@
 #include "httppil.h"
 #include "httpapi.h"
 #include "revision.h"
+#include "loadplugin.h"
 #ifdef MEDIA_SERVER
 #include "mediaserver.h"
 #endif
@@ -145,112 +146,30 @@ void GetFullPath(char* buffer, char* argv0, char* path)
 
 UrlHandler* urlHandlerList = NULL;
 
-int get_handler_list_length()
-{
-    int n = 0;
-    if (urlHandlerList)
-        for (n = 0; urlHandlerList[n].pchUrlPrefix; n++)
-            ;
-    return n;
-}
-
-void add_handler(const char* prefix, PFNURLCALLBACK uhf, PFNEVENTHANDLER ehf/*, void* psys = NULL*/)
-{
-    int n, length;
-    length = get_handler_list_length();
-    UrlHandler* new_list = calloc(length + 2, sizeof(UrlHandler));
-    if (new_list)
-    {
-        for (n = 0; n < length; ++n)
-        {
-            new_list[n] = urlHandlerList[n];
-        }
-        new_list[n].pchUrlPrefix = prefix;
-        new_list[n].pfnUrlHandler = uhf;
-        new_list[n].pfnEventHandler = ehf;
-        new_list[n].p_sys = NULL;
-
-        new_list[n+1].pchUrlPrefix = NULL;
-
-        free(urlHandlerList);
-        urlHandlerList = new_list;
-    }
-}
-
-void add_handler_from_dll(const char* arg)
-{
-    char* name, *function_name, *prefix, *tmp, *event_handler_name;
-    HANDLE library;
-    PFNEVENTHANDLER ehf = NULL;
-    PFNURLCALLBACK uhf;
-
-    name = malloc(strlen(arg) + 1);
-    strcpy(name, arg);
-    function_name = strrchr(name, ':');
-    prefix = strchr(name, ':');
-
-    if (prefix != NULL && function_name > prefix + 1)
-    {
-        *function_name = '\0';
-        ++function_name;
-        *prefix = '\0';
-        if (*function_name)
-        {
-            ++prefix;
-            tmp = prefix;
-            prefix = name;
-            name = tmp;
-            fprintf(stderr, "Loading handler. prefix: %s, dll: %s, function: %s\n", prefix, name, function_name);
-            library = LoadLibraryA(name);
-            if (library)
-            {
-                event_handler_name = strrchr(function_name, '|');
-                if (event_handler_name)
-                    *event_handler_name++ = '\0';
-                ehf = (PFNEVENTHANDLER)GetProcAddress(library, event_handler_name);
-                uhf = (PFNURLCALLBACK)GetProcAddress(library, function_name);
-                if (uhf)
-                    add_handler(prefix, uhf, ehf);
-                else
-                {
-                    fprintf(stderr, "couldn't load %s (Error: %d)!\n", function_name, GetLastError());
-                    FreeLibrary(library);
-                }
-            }
-            else
-                fprintf(stderr, "couldn't load \"%s\" (Error: %d)!\n", name, GetLastError());
-        }
-        else
-            fprintf(stderr, "function name shouldn't be empty in \"%s\"!\n", arg);
-    }
-    else
-        fprintf(stderr, "Two colons should be in \"%s\"!\n", arg);
-    }
-
 int main(int argc,char* argv[])
 {
-    add_handler("stats", uhStats, NULL);
+    add_handler(&urlHandlerList, "stats", uhStats, NULL);
 #ifdef ENABLE_SERIAL
-    add_handler("serial", uhSerial, NULL);
+    add_handler(&urlHandlerList, "serial", uhSerial, NULL);
 #endif
 #ifdef HAVE_THREAD
-    add_handler("async", uhAsyncDataTest, NULL);
+    add_handler(&urlHandlerList, "async", uhAsyncDataTest, NULL);
 #endif
 #ifdef MEDIA_SERVER
-    add_handler( "test.sdp", uhRTSP, NULL );
-    add_handler( "MediaServer/VideoItems/", uhMediaItemsTranscode, ehMediaItemsEvent );
+    add_handler(&urlHandlerList,  "test.sdp", uhRTSP, NULL );
+    add_handler(&urlHandlerList,  "MediaServer/VideoItems/", uhMediaItemsTranscode, ehMediaItemsEvent );
 #endif
 #ifdef _7Z
-    add_handler( "7z", uh7Zip, NULL );
+    add_handler(&urlHandlerList,  "7z", uh7Zip, NULL );
 #endif
 #ifdef _MPD
-    add_handler( "mpd", uhMpd, ehMpd );
+    add_handler(&urlHandlerList,  "mpd", uhMpd, ehMpd );
 #endif
 #ifdef _VOD
-    add_handler( "vodstream", uhVodStream, NULL );
-    add_handler( "vodlib", uhLib, 0 );
-    add_handler( "vodplay", uhVod, ehVod );
-    add_handler( "stream", uhStream, NULL );
+    add_handler(&urlHandlerList,  "vodstream", uhVodStream, NULL );
+    add_handler(&urlHandlerList,  "vodlib", uhLib, 0 );
+    add_handler(&urlHandlerList,  "vodplay", uhVod, ehVod );
+    add_handler(&urlHandlerList,  "stream", uhStream, NULL );
 #endif
 
 	fprintf(stderr,"MiniWeb (built on %s)\n(C)2005-2013 Written by Stanley Huang <stanleyhuangyc@gmail.com>\n\n", __DATE__);
@@ -330,7 +249,7 @@ int main(int argc,char* argv[])
 					break;
                 case 'c':
                     if ((++i)<argc)
-                        add_handler_from_dll(argv[i]);
+                        add_handler_from_dll(&urlHandlerList, argv[i]);
                     break;
 				}
 			}

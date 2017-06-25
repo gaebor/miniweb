@@ -1,7 +1,7 @@
 CC=cl
 LD=link
 CFLAGS=/Ox /W3 /Ilibctb/include /nologo /TC /MT
-HTTPOBJ=httppil.obj http.obj httpxml.obj httphandler.obj httppost.obj httpauth.obj
+HTTPOBJ=httppil.obj http.obj httpxml.obj httphandler.obj httppost.obj httpauth.obj loadplugin.obj
 HEADERS=httpint.h httpapi.h httpxml.h
 
 DEFINES= /D_CRT_SECURE_NO_DEPRECATE /DNDEBUG /DNODEBUG /DWIN32

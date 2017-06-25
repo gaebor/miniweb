@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O3 -Wunused-result
-HTTPOBJ = httppil.o http.o httpxml.o httphandler.o httppost.o httpauth.o
+HTTPOBJ = httppil.o http.o httpxml.o httphandler.o httppost.o httpauth.o loadplugin.o
 HEADERS = httpint.h httpapi.h httpxml.h
 ifndef TARGET
 TARGET = miniweb
@@ -15,6 +15,7 @@ LDFLAGS += -lwsock32
 OS="Win32"
 else
 #CFLAGS+= -fPIC
+LDFLAGS += -ldl
 OS="Linux"
 endif
 
@@ -36,11 +37,11 @@ endif
 
 all: $(HTTPOBJ)
 	@echo Building for $(OS)
-	$(CC) $(LDFLAGS) $(HTTPOBJ) -o $(TARGET)
+	$(CC) $(HTTPOBJ) $(LDFLAGS) -o $(TARGET)
 
 min: $(HTTPOBJ) httpmin.o
 	@echo Building for $(OS)
-	$(CC) $(LDFLAGS) $(HTTPOBJ) httpmin.o -o httpd
+	$(CC) $(HTTPOBJ) httpmin.o $(LDFLAGS) -o httpd
 
 install: all
 	@rm -f /usr/bin/$(TARGET)
