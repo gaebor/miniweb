@@ -1,9 +1,4 @@
-/*******************************************************************
-* Process Platform Independent Layer
-* Distributed under GPL license
-* Copyright (c) 2005-06 Stanley Huang <stanleyhuangyc@yahoo.com.cn>
-* All rights reserved.
-*******************************************************************/
+
 #ifndef _PROCESSPIL_H
 #define _PROCESSPIL_H
 
@@ -17,25 +12,25 @@
 #define SF_REDIRECT_OUTPUT (0x8000 | SF_REDIRECT_STDOUT)
 
 typedef struct {
-	unsigned int flags;
-	char *pchCurDir;
-	char *pchPath;
+    unsigned int flags;
+    char *pchCurDir;
+    char *pchPath;
 #ifdef WIN32
-	HANDLE fdRead;
-	HANDLE fdWrite;
-	int fdStdErr;
-	PROCESS_INFORMATION piProcInfo;
-	HWND hWnd;
+    HANDLE fdRead;
+    HANDLE fdWrite;
+    int fdStdErr;
+    PROCESS_INFORMATION piProcInfo;
+    HWND hWnd;
 #else
-	int fdRead;
-	int fdWrite;
-	int pid;
+    int fdRead;
+    int fdWrite;
+    int pid;
 #endif
-	char *pchEnv;
-	char *buffer;
-	int iRetCode;
-	int iBufferSize;
-	int locked;
+    char *pchEnv;
+    char *buffer;
+    int iRetCode;
+    int iBufferSize;
+    int locked;
 }SHELL_PARAM;
 
 #ifdef __cplusplus

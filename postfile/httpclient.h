@@ -11,18 +11,18 @@
 #define FLAG_CHUNKED 0x8
 
 typedef enum {
-	HS_IDLE=0,
-	HS_REQUESTING,
-	HS_RECEIVING,
-	HS_STOPPING,
+    HS_IDLE=0,
+    HS_REQUESTING,
+    HS_RECEIVING,
+    HS_STOPPING,
 } HTTP_STATES;
 
 typedef enum {
-	HM_GET = 0,
-	HM_HEAD,
-	HM_POST,
-	HM_POST_STREAM,
-	HM_POST_MULTIPART,
+    HM_GET = 0,
+    HM_HEAD,
+    HM_POST,
+    HM_POST_STREAM,
+    HM_POST_MULTIPART,
 } HTTP_METHOD;
 
 #define postPayload_STRING 0
@@ -34,36 +34,36 @@ typedef enum {
 typedef int (*PFNpostPayloadCALLBACK)(void* buffer, int bufsize);
 
 typedef struct {
-	void* data;
-	int type;
-	size_t length;
+    void* data;
+    int type;
+    size_t length;
 } POST_CHUNK;
 
 typedef struct {
-	int sockfd;
-	HTTP_METHOD method;
-	HTTP_STATES state;
-	char *url;
-	char *proxy;
-	unsigned short flags;
-	unsigned short port;
-	char* header;
-	char* buffer;
-	int bufferSize;
-	char* postPayload;
-	char* hostname;
-	int postPayloadBytes;
-	int dataSize;
-	int bytesStart;
-	int bytesEnd;
-	int payloadSize;
-	//info parsed from response header
-	char* contentType;
-	int httpCode;
-	//Multipart-Post 
-	POST_CHUNK* chunk;
-	int chunkCount;
-	char* filename;
+    int sockfd;
+    HTTP_METHOD method;
+    HTTP_STATES state;
+    char *url;
+    char *proxy;
+    unsigned short flags;
+    unsigned short port;
+    char* header;
+    char* buffer;
+    int bufferSize;
+    char* postPayload;
+    char* hostname;
+    int postPayloadBytes;
+    int dataSize;
+    int bytesStart;
+    int bytesEnd;
+    int payloadSize;
+    //info parsed from response header
+    char* contentType;
+    int httpCode;
+    //Multipart-Post 
+    POST_CHUNK* chunk;
+    int chunkCount;
+    char* filename;
 } HTTP_REQUEST;
 
 #ifdef __cplusplus

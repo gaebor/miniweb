@@ -148,36 +148,36 @@ typedef struct _tagSubstParam {
 #define ISFLAGSET(hs,bit) (hs->flags&(bit))
 
 typedef union {
-	unsigned long laddr;
-	unsigned short saddr[2];
-	unsigned char caddr[4];
+    unsigned long laddr;
+    unsigned short saddr[2];
+    unsigned char caddr[4];
 } IPADDR;
 
 typedef struct {
-	int iHttpVer;
-	size_t startByte;
-	char *pucPath;
-	const char *pucReferer;
-	char* pucHost;
-	int headerSize;
-	char* pucPayload;
-	size_t payloadSize;
-	int iCSeq;
-	const char* pucTransport;
-	const char* pucAuthInfo;
+    int iHttpVer;
+    size_t startByte;
+    char *pucPath;
+    const char *pucReferer;
+    char* pucHost;
+    int headerSize;
+    char* pucPayload;
+    size_t payloadSize;
+    int iCSeq;
+    const char* pucTransport;
+    const char* pucAuthInfo;
 } HttpRequest;
 
 typedef struct {
-	int statusCode;
-	int headerBytes;
-	int sentBytes;
-	size_t contentLength;
-	HttpFileType fileType;
+    int statusCode;
+    int headerBytes;
+    int sentBytes;
+    size_t contentLength;
+    HttpFileType fileType;
 } HttpResponse;
 
 typedef struct {
-	char *name;
-	char *value;
+    char *name;
+    char *value;
 } HttpVariables;
 
 // Callback function protos
@@ -187,25 +187,25 @@ typedef int (*PFNFILEUPLOADCALLBACK)(HttpMultipart*, OCTET*, size_t);
 typedef int (*PFNIDLECALLBACK)(void* hp);
 
 typedef enum {
-	MW_INIT = 0,
-	MW_UNINIT,
-	MW_PARSE_ARGS,
+    MW_INIT = 0,
+    MW_UNINIT,
+    MW_PARSE_ARGS,
 } MW_EVENT;
 
 typedef int (*PFNEVENTHANDLER)(MW_EVENT msg, void* handler, void* hp);
 
 typedef struct {
-	time_t startTime;
-	WORD clientCount;
-	WORD clientCountMax;
-	size_t reqCount;
-	size_t fileSentCount;
-	size_t fileSentBytes;
-	int varSubstCount;
-	int urlProcessCount;
-	int timeOutCount;
-	int authFailCount;
-	int fileUploadCount;
+    time_t startTime;
+    WORD clientCount;
+    WORD clientCountMax;
+    size_t reqCount;
+    size_t fileSentCount;
+    size_t fileSentBytes;
+    int varSubstCount;
+    int urlProcessCount;
+    int timeOutCount;
+    int authFailCount;
+    int fileUploadCount;
 } HttpStats;
 
 #define HTTP_BUFFER_SIZE (128*1024 /*bytes*/)
@@ -213,53 +213,53 @@ typedef struct {
 
 // per connection/socket structure
 typedef struct _HttpSocket{
-	SOCKET socket;
-	IPADDR ipAddr;
+    SOCKET socket;
+    IPADDR ipAddr;
 
-	HttpRequest request;
-	HttpResponse response;
-	char *pucData;
-	int bufferSize;			// the size of buffer pucData pointing to
-	int dataLength;
+    HttpRequest request;
+    HttpResponse response;
+    char *pucData;
+    int bufferSize;			// the size of buffer pucData pointing to
+    int dataLength;
 #ifdef WINCE
-	HANDLE fd;
+    HANDLE fd;
 #else
-	int fd;
+    int fd;
 #endif
-	unsigned int flags;
-	void* handler;				// http handler function address
-	void* ptr;
-	time_t tmAcceptTime;
-	time_t tmExpirationTime;
-	DWORD dwResumeTick;
-	int iRequestCount;
-	char* mimeType;
-	HttpMultipart* pxMP;
-	char* buffer;
+    unsigned int flags;
+    void* handler;				// http handler function address
+    void* ptr;
+    time_t tmAcceptTime;
+    time_t tmExpirationTime;
+    DWORD dwResumeTick;
+    int iRequestCount;
+    char* mimeType;
+    HttpMultipart* pxMP;
+    char* buffer;
 } HttpSocket;
 
 typedef struct {
-	void* hp;
-	HttpSocket* hs;
-	const char *pucRequest;
-	HttpVariables* pxVars;
-	int iVarCount;
-	char *pucHeader;
-	char *pucBuffer;
-	char *pucPayload;
-	int dataBytes;
-	int contentBytes;
-	HttpFileType fileType;
-	void *p_sys;
+    void* hp;
+    HttpSocket* hs;
+    const char *pucRequest;
+    HttpVariables* pxVars;
+    int iVarCount;
+    char *pucHeader;
+    char *pucBuffer;
+    char *pucPayload;
+    int dataBytes;
+    int contentBytes;
+    HttpFileType fileType;
+    void *p_sys;
 } UrlHandlerParam;
 
 typedef int (*PFNURLCALLBACK)(UrlHandlerParam*);
 
 typedef struct {
-	const char* pchUrlPrefix;
-	PFNURLCALLBACK pfnUrlHandler;
-	PFNEVENTHANDLER pfnEventHandler;
-	void *p_sys;
+    const char* pchUrlPrefix;
+    PFNURLCALLBACK pfnUrlHandler;
+    PFNEVENTHANDLER pfnEventHandler;
+    void *p_sys;
 } UrlHandler;
 
 #define AUTH_NO_NEED (0)
@@ -270,17 +270,17 @@ typedef struct {
 #define MAX_AUTH_INFO_LEN 64
 
 typedef struct {
-	const char* pchUrlPrefix;
-	const char* pchUsername;
-	const char* pchPassword;
-	const char* pchOtherInfo;
-	char pchAuthString[MAX_AUTH_INFO_LEN];
+    const char* pchUrlPrefix;
+    const char* pchUsername;
+    const char* pchPassword;
+    const char* pchOtherInfo;
+    char pchAuthString[MAX_AUTH_INFO_LEN];
 } AuthHandler;
 
 #ifndef DISABLE_VIRTUAL_PATH
 typedef struct {
-	char* pchUrlPrefix;
-	char pchLocalRealPath[MAX_PATH];
+    char* pchUrlPrefix;
+    char pchLocalRealPath[MAX_PATH];
 } VirtPathHandler;
 #endif
 
@@ -288,44 +288,44 @@ typedef struct {
 #define FLAG_DISABLE_RANGE 2
 
 typedef struct _httpParam {
-	HttpSocket* hsSocketQueue;				/* socket queue*/
-	int maxClients;
-	int maxClientsPerIP;
-	int bKillWebserver;
-	int bWebserverRunning;
-	unsigned int flags;
-	SOCKET listenSocket;
-	int httpPort;
-	int socketRcvBufSize;	/* socket receive buffer size in KB */
-	char pchWebPath[128];
-	UrlHandler *pxUrlHandler;		/* pointer to URL handler array */
-	AuthHandler *pxAuthHandler;     /* pointer to authorization handler array */
+    HttpSocket* hsSocketQueue;				/* socket queue*/
+    int maxClients;
+    int maxClientsPerIP;
+    int bKillWebserver;
+    int bWebserverRunning;
+    unsigned int flags;
+    SOCKET listenSocket;
+    int httpPort;
+    int socketRcvBufSize;	/* socket receive buffer size in KB */
+    char pchWebPath[128];
+    UrlHandler *pxUrlHandler;		/* pointer to URL handler array */
+    AuthHandler *pxAuthHandler;     /* pointer to authorization handler array */
 #ifndef DISABLE_VIRTUAL_PATH
-	VirtPathHandler *pxVirtPathHandler;
+    VirtPathHandler *pxVirtPathHandler;
 #endif
-	// substitution callback
-	PFNSUBSTCALLBACK pfnSubst;
-	// post callbacks
-	PFNFILEUPLOADCALLBACK pfnFileUpload;
-	PFNPOSTCALLBACK pfnPost;
-	// idle callback
-	PFNIDLECALLBACK pfnIdleCallback;
-	// misc
-	DWORD dwAuthenticatedNode;
-	time_t tmAuthExpireTime;
-	time_t tmSocketExpireTime;
-	int maxDownloadSpeed; /* maximum download speed in KB/s */
-	HttpStats stats;
-	u_long hlBindIP;
-	void* szctx;
+    // substitution callback
+    PFNSUBSTCALLBACK pfnSubst;
+    // post callbacks
+    PFNFILEUPLOADCALLBACK pfnFileUpload;
+    PFNPOSTCALLBACK pfnPost;
+    // idle callback
+    PFNIDLECALLBACK pfnIdleCallback;
+    // misc
+    DWORD dwAuthenticatedNode;
+    time_t tmAuthExpireTime;
+    time_t tmSocketExpireTime;
+    int maxDownloadSpeed; /* maximum download speed in KB/s */
+    HttpStats stats;
+    u_long hlBindIP;
+    void* szctx;
 } HttpParam;
 
 typedef struct {
-	const char* pchRootPath;
-	const char* pchHttpPath;
-	char cFilePath[MAX_PATH];
-	char* pchExt;
-	int fTailSlash;
+    const char* pchRootPath;
+    const char* pchHttpPath;
+    char cFilePath[MAX_PATH];
+    char* pchExt;
+    int fTailSlash;
 } HttpFilePath;
 
 ///////////////////////////////////////////////////////////////////////

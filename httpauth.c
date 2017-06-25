@@ -21,13 +21,13 @@
 ////////////////////////////////////////////////////////////////////////////
 BOOL _mwCheckAuthentication(HttpParam *hp, HttpSocket* phsSocket)
 {
-	if (!ISFLAGSET(phsSocket,FLAG_AUTHENTICATION))
-		return TRUE;
-	if (hp->dwAuthenticatedNode != phsSocket->ipAddr.laddr) {
-		// Not authenticated
-		hp->stats.authFailCount++;
-		return FALSE;
-	} 
+    if (!ISFLAGSET(phsSocket,FLAG_AUTHENTICATION))
+        return TRUE;
+    if (hp->dwAuthenticatedNode != phsSocket->ipAddr.laddr) {
+        // Not authenticated
+        hp->stats.authFailCount++;
+        return FALSE;
+    } 
     // Extend authentication period
     hp->tmAuthExpireTime = time(NULL) + HTTPAUTHTIMEOUT;
   return TRUE;

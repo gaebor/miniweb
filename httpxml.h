@@ -4,11 +4,11 @@
 extern "C" {
 #endif
 typedef struct {
-	char* name;
-	char* fmt;
-	void* value;
-	int indent;
-	int flags;
+    char* name;
+    char* fmt;
+    void* value;
+    int indent;
+    int flags;
 } HTTP_XML_NODE;
 
 int mwWriteXmlHeader(char** pbuf, int* pbufsize, int ver, char* charset, char* xsl);
