@@ -96,7 +96,7 @@ void add_handler_from_dll(UrlHandler** urlHandlerList, const char* arg)
             tmp = prefix;
             prefix = name;
             name = tmp;
-            fprintf(stderr, "Loading handler. prefix: %s, dll: %s, function: %s\n", prefix, name, function_name);
+            fprintf(stderr, "Loading handler... prefix: %s, dll: %s, function: %s\n", prefix, name, function_name);
             library = LoadDll(name);
             if (library)
             {

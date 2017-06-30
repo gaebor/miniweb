@@ -166,7 +166,7 @@ int httpRequest(HTTP_REQUEST* param)
     do {
         int hdrsize = (int)strlen(param->header);
 
-        if ((target_host = gethostbyname((const char*)param->hostname)) == NULL) {
+        if ((target_host = gethostbyname(param->hostname)) == NULL) {
             ret = -1;
             continue;
         }

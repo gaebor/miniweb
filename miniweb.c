@@ -171,7 +171,9 @@ int main(int argc,char* argv[])
     add_handler(&urlHandlerList,  "stream", uhStream, NULL );
 #endif
 
-    fprintf(stderr,"MiniWeb (built on %s)\ncontact: borbely@math.bme.hu\n\n", __DATE__);
+    fprintf(stderr, "MiniWeb (built on %s)\n", __DATE__);
+    fprintf(stderr, "contact: borbely@math.bme.hu\n");
+    fprintf(stderr, "github: https://github.com/gaebor/miniweb\n\n");
 
 #ifdef WIN32
     SetConsoleCtrlHandler( (PHANDLER_ROUTINE) MiniWebQuit, TRUE );
@@ -254,7 +256,6 @@ int main(int argc,char* argv[])
             }
         }
     }
-    httpParam.pxUrlHandler = urlHandlerList;
     {
         int i;
         int error = 0;
@@ -277,11 +278,12 @@ int main(int argc,char* argv[])
         printf("Host: %s:%d\n", GetLocalAddrString(), httpParam.httpPort);
         printf("Web root: %s\n",httpParam.pchWebPath);
         printf("Max clients (per IP): %d (%d)\n",httpParam.maxClients, httpParam.maxClientsPerIP);
-        for (n=0;urlHandlerList[n].pchUrlPrefix;n++);
+        for (n = 0; urlHandlerList[n].pchUrlPrefix; n++);
         printf("URL handlers: %d\n",n);
         if (httpParam.flags & FLAG_DIR_LISTING) printf("Dir listing enabled\n");
         if (httpParam.flags & FLAG_DISABLE_RANGE) printf("Byte-range disabled\n");
 
+        httpParam.pxUrlHandler = urlHandlerList;
         //register page variable substitution callback
         //httpParam[i].pfnSubst=DefaultWebSubstCallback;
 

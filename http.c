@@ -532,7 +532,7 @@ void* mwHttpLoop(void* _hp)
             tvSelectWait.tv_usec = 0; // note: using timeval here -> usec not nsec
 
             // and check sockets (may take a while!)
-            iRc=select(iSelectMaxFds+1, &fdsSelectRead, &fdsSelectWrite,
+            iRc=select((int)iSelectMaxFds+1, &fdsSelectRead, &fdsSelectWrite,
                     NULL, &tvSelectWait);
         }
         if (iRc<0) {
@@ -1199,7 +1199,7 @@ int _mwProcessReadSocket(HttpParam* hp, HttpSocket* phsSocket)
                 } else if (!phsSocket->request.pucPayload) {
                     // first receive of payload, prepare for next receive
                     if (phsSocket->request.payloadSize > MAX_POST_PAYLOAD_SIZE) phsSocket->request.payloadSize = MAX_POST_PAYLOAD_SIZE;
-                    phsSocket->bufferSize = phsSocket->request.payloadSize + 1;
+                    phsSocket->bufferSize = (int)(phsSocket->request.payloadSize) + 1;
                     phsSocket->request.pucPayload = malloc(phsSocket->bufferSize);
                     phsSocket->pucData = phsSocket->request.pucPayload;
                     // payload length already received

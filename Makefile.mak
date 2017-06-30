@@ -1,6 +1,6 @@
 CC=cl
 LD=link
-CFLAGS=/Ox /W3 /Ilibctb/include /nologo /TC /MT
+CFLAGS=/O2 /W3 /Ilibctb/include /nologo /TC /MT
 HTTPOBJ=httppil.obj http.obj httpxml.obj httphandler.obj httppost.obj httpauth.obj loadplugin.obj
 HEADERS=httpint.h httpapi.h httpxml.h
 

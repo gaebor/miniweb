@@ -154,7 +154,7 @@ int ReadDir(const char* pchDir, char* pchFileNameBuf)
     }
     if (pchDir) {
         char *p;
-        int len;
+        size_t len;
         if (!IsDir(pchDir)) return -1;
         if (hFind) FindClose(hFind);
         len = strlen(pchDir);
